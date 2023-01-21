@@ -17,15 +17,22 @@ export class AppComponent {
     [0, -1, 0, -1, 0, -1, 0, -1],
     [-1, 0, -1, 0, -1, 0, -1, 0]
   ];
-  currentPos: any;
+  clickedCurrentPos: any;
+  clickedNewPos: any;
 
   onPieceClick(piece:number, i:number, j:number) {
-    if (this.currentPos) {
-      this.moveChecker(this.board, this.currentPos, { x: this.currentPos.x+1, y: this.currentPos.y+1 })
-      this.currentPos = null;
-    } 
-    else if (!this.currentPos && (piece === 1 || piece === -1)) {
-      this.currentPos = { x: i, y: j };
+    // could possibly change this to a switch (true) statement
+
+    // current piece already clicked/set; move the piece
+    if (this.clickedCurrentPos && (piece === 0)) {
+      this.clickedNewPos = { x: i, y: j };
+      this.moveChecker(this.board, this.clickedCurrentPos, this.clickedNewPos)
+      this.clickedCurrentPos = null;
+      this.clickedNewPos = null;
+    }
+    // no currentPiece set and colored piece clicked on; set the clickedCurrent
+    else if (!this.clickedCurrentPos && (piece === 1 || piece === -1)) {
+      this.clickedCurrentPos = { x: i, y: j };
     }
   }
 
@@ -54,26 +61,29 @@ export class AppComponent {
               return "Invalid move for king";
           }
       }else{
+
+         // check if a capture is being made
+        const isCapture = Math.abs(newPos.x - currentPos.x) === 2 && Math.abs(newPos.y - currentPos.y) === 2;
+        if (isCapture) {
+            // calculate the position of the captured piece
+            const capturedPos = {
+                x: (currentPos.x + newPos.x) / 2,
+                y: (currentPos.y + newPos.y) / 2
+            };
+            // check if the captured piece is of the opposite color
+            if (board[capturedPos.x][capturedPos.y] === 0 || board[capturedPos.x][capturedPos.y] === checker) {
+                return "Invalid capture";
+            }
+            // remove the captured piece from the board
+            board[capturedPos.x][capturedPos.y] = 0;
+        } 
+        else {
           // check if newPos is a valid move for the checker
           if (Math.abs(newPos.x - currentPos.x) !== 1 || Math.abs(newPos.y - currentPos.y) !== 1) {
               return "Invalid move";
           }
-      }
+        }
 
-      // check if a capture is being made
-      const isCapture = Math.abs(newPos.x - currentPos.x) === 2 && Math.abs(newPos.y - currentPos.y) === 2;
-      if (isCapture) {
-          // calculate the position of the captured piece
-          const capturedPos = {
-              x: (currentPos.x + newPos.x) / 2,
-              y: (currentPos.y + newPos.y) / 2
-          };
-          // check if the captured piece is of the opposite color
-          if (board[capturedPos.x][capturedPos.y] === 0 || board[capturedPos.x][capturedPos.y] === checker) {
-              return "Invalid capture";
-          }
-          // remove the captured piece from the board
-          board[capturedPos.x][capturedPos.y] = 0;
       }
 
       // check if the checker reaches the opposite side of the board
