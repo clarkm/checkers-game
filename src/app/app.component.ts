@@ -1,11 +1,11 @@
-import { Component } from '@angular/core';
+import { Component, OnInit } from '@angular/core';
 
 @Component({
   selector: 'app-root',
   templateUrl: './app.component.html',
   styleUrls: ['./app.component.scss']
 })
-export class AppComponent {
+export class AppComponent implements OnInit {
   title = 'CheckersGame';
   board = [
     [0, 1, 0, 1, 0, 1, 0, 1],
@@ -19,9 +19,10 @@ export class AppComponent {
   ];
   clickedCurrentPos: any;
   clickedNewPos: any;
+  // rule is black goes first
+  playerTurn = "black";
 
   onPieceClick(piece:number, i:number, j:number) {
-    // could possibly change this to a switch (true) statement
 
     // current piece already clicked/set; move the piece
     if (this.clickedCurrentPos && (piece === 0)) {
@@ -31,7 +32,7 @@ export class AppComponent {
       this.clickedNewPos = null;
     }
     // no currentPiece set and colored piece clicked on; set the clickedCurrent
-    else if (!this.clickedCurrentPos && (piece === 1 || piece === -1)) {
+    else if (!this.clickedCurrentPos && (piece === 1 || piece === -1 || piece === 3 || piece === -3)) {
       this.clickedCurrentPos = { x: i, y: j };
     }
   }
@@ -46,21 +47,45 @@ export class AppComponent {
       // check if currentPos and newPos are valid positions on the board
       if (currentPos.x < 0 || currentPos.x > 7 || currentPos.y < 0 || currentPos.y > 7 ||
           newPos.x < 0 || newPos.x > 7 || newPos.y < 0 || newPos.y > 7) {
+            debugger;
           return "Invalid position";
       }
       // check if there is a checker at currentPos
       if (board[currentPos.x][currentPos.y] === 0) {
+          debugger;
           return "No checker at current position";
       }
 
       let checker = board[currentPos.x][currentPos.y]
 
-      if(checker > 1 ){
+      // check if it's the correct player's turn
+    if ((checker > 0 && this.playerTurn === "red") || (checker < 0 && this.playerTurn === "black")) {
+      alert("It's not your turn");
+      return;
+  }
+
+      // check if the checker reaches the opposite side of the board
+      // and that they're not already a king
+      if ((checker > 0 && newPos.x === 7) && checker !== 3) {
+          checker = checker + 2;
+      } else if ((checker < 0 && newPos.x === 0) && checker !== -3) {
+          checker = checker - 2;
+      }
+
+      if(checker > 1 || checker < -1){
           // check if newPos is a valid move for the king
           if(Math.abs(newPos.x - currentPos.x) !== Math.abs(newPos.y - currentPos.y) ) {
+            debugger;
               return "Invalid move for king";
           }
-      }else{
+      } else{
+          // check if the checker is moving backwards
+          if ((checker > 0 && newPos.x < currentPos.x) || (checker < 0
+            && newPos.x > currentPos.x)) {
+              debugger;
+                return "Checker cannot move backwards";
+            }
+          
 
          // check if a capture is being made
         const isCapture = Math.abs(newPos.x - currentPos.x) === 2 && Math.abs(newPos.y - currentPos.y) === 2;
@@ -72,6 +97,7 @@ export class AppComponent {
             };
             // check if the captured piece is of the opposite color
             if (board[capturedPos.x][capturedPos.y] === 0 || board[capturedPos.x][capturedPos.y] === checker) {
+                debugger;
                 return "Invalid capture";
             }
             // remove the captured piece from the board
@@ -79,25 +105,33 @@ export class AppComponent {
         } 
         else {
           // check if newPos is a valid move for the checker
-          if (Math.abs(newPos.x - currentPos.x) !== 1 || Math.abs(newPos.y - currentPos.y) !== 1) {
+          // verify they're not a king first
+          if (
+            (checker !== 3 || checker !== -3) &&
+             Math.abs(newPos.x - currentPos.x) !== 1 || Math.abs(newPos.y - currentPos.y) !== 1) 
+          {
+              debugger;
               return "Invalid move";
           }
         }
 
       }
 
-      // check if the checker reaches the opposite side of the board
-      if (checker > 0 && newPos.x === 0) {
-          checker = checker + 2;
-      } else if (checker < 0 && newPos.x === 7) {
-          checker = checker - 2;
-      }
-
       // move the checker
       board[newPos.x][newPos.y] = checker;
       board[currentPos.x][currentPos.y] = 0;
 
+      // toggle player turn
+      if (this.playerTurn === "red") {
+        this.playerTurn = "black";
+      } else {
+        this.playerTurn = "red";
+      }
       return board;
+  }
+
+  ngOnInit(): void {
+
   }
 
 }

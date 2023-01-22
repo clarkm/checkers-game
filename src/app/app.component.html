@@ -1,9 +1,12 @@
 <h2>{{ title }}</h2>
+<h3>{{ playerTurn }}'s turn</h3>
 <div>
   <p *ngFor="let row of board;let i = index">
     <span 
     *ngFor="let piece of row;let j = index" 
     (click)="onPieceClick(piece, i, j)"
-    [ngStyle]="{ 'background-color': (piece === -1) ? 'red': (piece === 1) ? 'black' : 'white' }"></span>
+    [ngStyle]="{ 
+      'background-color': (piece === -1) ? 'red': (piece === 1) ? 'black' : (piece === -3 || piece === 3) ? 'purple' : 'white' 
+    }"></span>
     </p>
 </div>
