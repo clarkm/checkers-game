@@ -6,7 +6,8 @@
     *ngFor="let piece of row;let j = index" 
     (click)="onPieceClick(piece, i, j)"
     [ngStyle]="{ 
-      'background-color': (piece === -1) ? 'red': (piece === 1) ? 'black' : (piece === -3 || piece === 3) ? 'purple' : 'white' 
+      'border': clickedCurrentPos ? '2px dotted green' : '2px dotted red',
+      'background-color': (piece === -1) ? 'red': (piece === 1) ? 'black' : (piece === -3) ? 'darkred' : (piece === 3) ? 'grey' : 'white' 
     }"></span>
     </p>
 </div>
