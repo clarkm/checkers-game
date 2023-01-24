@@ -22,12 +22,17 @@ export class AppComponent implements OnInit {
   // rule is black goes first
   playerTurn = "black";
 
+  redCheckersRemaining: Number[] = [];
+  blackCheckersRemaining: Number[] = [];
+
   onPieceClick(piece:number, i:number, j:number) {
 
     // current piece already clicked/set; move the piece
     if (this.clickedCurrentPos && (piece === 0)) {
       this.clickedNewPos = { x: i, y: j };
       this.moveChecker(this.board, this.clickedCurrentPos, this.clickedNewPos)
+      // run the counters:
+      this.countPieces();
       this.clickedCurrentPos = null;
       this.clickedNewPos = null;
     }
@@ -35,6 +40,30 @@ export class AppComponent implements OnInit {
     else if (!this.clickedCurrentPos && (piece === 1 || piece === -1 || piece === 3 || piece === -3)) {
       this.clickedCurrentPos = { x: i, y: j };
     }
+  }
+
+  countPieces() {
+    this.redCheckersRemaining = [];
+    this.blackCheckersRemaining = [];
+
+    this.board.forEach(
+      row => row.forEach(
+        checker => {
+          if (checker === 1) {
+            this.blackCheckersRemaining.push(checker);
+          } 
+          if (checker === -1) {
+            this.redCheckersRemaining.push(checker);
+          }
+        }) )
+
+    if (this.redCheckersRemaining.length === 0) {
+      alert(`Black Wins!!`)
+    }
+    if (this.blackCheckersRemaining.length === 0) {
+      alert(`Red Wins!!`)
+    }
+
   }
 
   moveChecker(board:any, currentPos:any, newPos:any) {
@@ -134,7 +163,7 @@ export class AppComponent implements OnInit {
   }
 
   ngOnInit(): void {
-
+    this.countPieces();
   }
 
 }
