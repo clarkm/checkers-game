@@ -76,15 +76,18 @@ export class AppComponent implements OnInit {
           // check if newPos is a valid move for the king
           if(Math.abs(newPos.x - currentPos.x) !== Math.abs(newPos.y - currentPos.y) ) {
             debugger;
-              return "Invalid move for king";
+            alert("Invalid move for king");
+            return;
           }
-      } else{
-          // check if the checker is moving backwards
-          if ((checker > 0 && newPos.x < currentPos.x) || (checker < 0
-            && newPos.x > currentPos.x)) {
-              debugger;
-                return "Checker cannot move backwards";
-            }
+      }
+
+      // check if the checker is moving backwards
+      if ((checker === 1 && newPos.x < currentPos.x) || (checker === -1
+        && newPos.x > currentPos.x)) {
+          debugger;
+          alert("Checker cannot move backwards");
+          return;
+        }
           
 
          // check if a capture is being made
@@ -115,7 +118,7 @@ export class AppComponent implements OnInit {
           }
         }
 
-      }
+      
 
       // move the checker
       board[newPos.x][newPos.y] = checker;
