@@ -49,19 +49,41 @@ export class AppComponent implements OnInit {
     this.board.forEach(
       row => row.forEach(
         checker => {
-          if (checker === 1) {
+          if (checker === 1 || checker === 3) {
             this.blackCheckersRemaining.push(checker);
           } 
-          if (checker === -1) {
+          if (checker === -1 || checker === -3) {
             this.redCheckersRemaining.push(checker);
           }
         }) )
 
     if (this.redCheckersRemaining.length === 0) {
-      alert(`Black Wins!!`)
+      alert(`Black Wins!!`);
+      // reset board
+      this.board = [
+        [0, 1, 0, 1, 0, 1, 0, 1],
+        [1, 0, 1, 0, 1, 0, 1, 0],
+        [0, 1, 0, 1, 0, 1, 0, 1],
+        [0, 0, 0, 0, 0, 0, 0, 0],
+        [0, 0, 0, 0, 0, 0, 0, 0],
+        [-1, 0, -1, 0, -1, 0, -1, 0],
+        [0, -1, 0, -1, 0, -1, 0, -1],
+        [-1, 0, -1, 0, -1, 0, -1, 0]
+      ];
     }
     if (this.blackCheckersRemaining.length === 0) {
-      alert(`Red Wins!!`)
+      alert(`Red Wins!!`);
+      // reset board
+      this.board = [
+        [0, 1, 0, 1, 0, 1, 0, 1],
+        [1, 0, 1, 0, 1, 0, 1, 0],
+        [0, 1, 0, 1, 0, 1, 0, 1],
+        [0, 0, 0, 0, 0, 0, 0, 0],
+        [0, 0, 0, 0, 0, 0, 0, 0],
+        [-1, 0, -1, 0, -1, 0, -1, 0],
+        [0, -1, 0, -1, 0, -1, 0, -1],
+        [-1, 0, -1, 0, -1, 0, -1, 0]
+      ];
     }
 
   }
@@ -128,10 +150,32 @@ export class AppComponent implements OnInit {
                 y: (currentPos.y + newPos.y) / 2
             };
             // check if the captured piece is of the opposite color
-            if (board[capturedPos.x][capturedPos.y] === 0 || board[capturedPos.x][capturedPos.y] === checker) {
-                debugger;
-                return "Invalid capture";
+            // make sure it's not their king color either
+
+            // a like-colored piece cannot jump its king,
+            const kingColorNum = checker === 1 ? 3 : -3;
+            // if a king do this:
+            if(checker > 1 || checker < -1){
+              // prevent king from jumping its own colored pieces
+              const sameTeamPiece = checker === 3 ? 1 : -1;
+              if (board[capturedPos.x][capturedPos.y] === 0 
+                || board[capturedPos.x][capturedPos.y] === checker
+                || board[capturedPos.x][capturedPos.y] === sameTeamPiece
+                ) {
+                  console.log("cannot jump same team");
+                  return;
+                }              
+            } else {
+              // if not a king do this:
+              if (board[capturedPos.x][capturedPos.y] === 0 
+                || board[capturedPos.x][capturedPos.y] === checker
+                || board[capturedPos.x][capturedPos.y] === kingColorNum
+                ) {
+                  console.log("Invalid capture");
+                  return;
+              }
             }
+
             // remove the captured piece from the board
             board[capturedPos.x][capturedPos.y] = 0;
         } 
@@ -154,12 +198,14 @@ export class AppComponent implements OnInit {
       board[currentPos.x][currentPos.y] = 0;
 
       // toggle player turn
-      if (this.playerTurn === "red") {
-        this.playerTurn = "black";
-      } else {
-        this.playerTurn = "red";
-      }
+      this.toggleTurn();
+
       return board;
+  }
+
+  toggleTurn() {
+    // update the player's turn
+    this.playerTurn = this.playerTurn === "red" ? "black" : "red";
   }
 
   ngOnInit(): void {
